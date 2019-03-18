@@ -1,0 +1,32 @@
+version: '3.3'
+
+services:
+    wordpress:
+        image: wordpress:latest
+        ports:
+            - "8000:80"
+        depends_on:
+            - db
+        restart: always
+        environment:
+            WORDPRESS_DB_HOST: "db:3306"
+            #wordpressをサブディレクトリに入れない場合は下記1行は不要
+            WORDPRESS_SUBDIRECTORY: wp
+        env_file: .env
+        volumes:
+            - ./html/cp/okara:/var/www/html/cp/okara
+            - ./html/themes/sample:/var/www/html/wp/wp-content/themes/sample
+            - ./html/themes/k-tounyu:/var/www/html/wp/wp-content/themes/k-tounyu
+            - ./docker-entrypoint.sh:/usr/local/bin/docker-entrypoint.sh
+
+    db:
+        image: mysql:5.7
+        restart: always
+        env_file: .env
+        volumes:
+            - db_data:/var/lib/mysql
+            - ./db-data/mysql.dump.sql:/docker-entrypoint-initdb.d/install_wordpress.sql
+
+
+volumes:
+    db_data: {}
